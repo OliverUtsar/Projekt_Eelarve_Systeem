@@ -44,9 +44,12 @@ def ava_sissetuleku_aken():
         except ValueError:
             messagebox.showerror("Viga", "Palun sisesta kehtiv sissetulek.")
             
+    # Sulgeb sisstetulekute akna ja avab eelistuste akna        
     def ava_eelistused():
         sissetuleku_aken.destroy()
         ava_eelistused_aken()
+        
+    
 
     def mine_edasi():
         sissetuleku_aken.destroy()
@@ -63,6 +66,7 @@ def ava_sissetuleku_aken():
     
     
 def ava_eelistused_aken():
+    
     eelistus_protsent = ""
     eelistus_kategooria =""
 # TODO nupu töö  ei saa protsenti??
@@ -78,7 +82,7 @@ def ava_eelistused_aken():
 
         
 # TODO nupu töö
-    def tagasi():
+    def tagasi_sissetuleku_aken():
         eelistused_aken.destroy()
         ava_sissetuleku_aken()
         
@@ -97,7 +101,7 @@ def ava_eelistused_aken():
     protsent_var = tk.StringVar()
     tk.Entry(eelistused_aken, textvariable=protsent_var).grid(row=3, column=1)
     tk.Button(eelistused_aken, text="Kinnita", command=kinnita_eelisus).grid(row=4, column=0, columnspan = 1, pady=5)
-    tk.Button(eelistused_aken, text="Tagasi", command=tagasi).grid(row=4, column=2, columnspan = 1, pady=5)
+    tk.Button(eelistused_aken, text="Tagasi", command=tagasi_sissetuleku_aken).grid(row=4, column=2, columnspan = 1, pady=5)
     eelistused_aken.mainloop()
     
     
@@ -107,22 +111,26 @@ def ava_eelistused_aken():
 
 # Põhiaken kulude haldamiseks
 def ava_kulude_aken():
-    app = tk.Tk()
-    app.title(f"Eelarve Jälgimine - {kuu_nimi}")
+    kulude_aken = tk.Tk()
+    kulude_aken.title(f"Eelarve Jälgimine - {kuu_nimi}")
 
-    tk.Label(app, text=f"Kuu sissetulek: €{sissetulek:.2f}").grid(row=0, column=0, columnspan=2, pady=5)
+    tk.Label(kulude_aken, text=f"Kuu sissetulek: €{sissetulek:.2f}").grid(row=0, column=0, columnspan=2, pady=5)
 
     # Sisestusväljad ja nupud kulude lisamiseks
     summa_var = tk.StringVar()
 
-    tk.Label(app, text="Summa (€):").grid(row=1, column=0)
-    tk.Entry(app, textvariable=summa_var).grid(row=1, column=1)
+    tk.Label(kulude_aken, text="Summa (€):").grid(row=1, column=0)
+    tk.Entry(kulude_aken, textvariable=summa_var).grid(row=1, column=1)
 
-    tk.Label(app, text="Kategooria:").grid(row=2, column=0)
+    tk.Label(kulude_aken, text="Kategooria:").grid(row=2, column=0)
     
     kategooria_var = tk.StringVar()
-    kulutuste_dropdown = tk.OptionMenu(app, kategooria_var, *kategooriad)
+    kulutuste_dropdown = tk.OptionMenu(kulude_aken, kategooria_var, *kategooriad)
     kulutuste_dropdown.grid(row=2, column=1)
+    
+    def ava_eelistused():
+        kulude_aken.destroy()
+        ava_eelistused_aken()
 
      # Funktsioon kulude lisamiseks
     def lisa_kulu():
@@ -190,12 +198,15 @@ def ava_kulude_aken():
         messagebox.showinfo("Soovitus", soovitus)
 
     # Nupud kulude lisamiseks ja vaatamiseks
-    tk.Button(app, text="Lisa kulu", command=lisa_kulu).grid(row=4, column=0, pady=10)
-    tk.Button(app, text="Vaata kulusid", command=vaata_kulusid).grid(row=4, column=1, pady=10)
-    tk.Button(app, text="Kuva graafik", command=kuva_graafik).grid(row=5, column=0, pady=10)
-    tk.Button(app, text="Kuva soovitus", command=kuva_soovitus).grid(row=5, column=1, pady=10)
+    tk.Button(kulude_aken, text="Lisa kulu", command=lisa_kulu).grid(row=4, column=0, pady=10)
+    tk.Button(kulude_aken, text="Vaata kulusid", command=vaata_kulusid).grid(row=4, column=1, pady=10)
+    tk.Button(kulude_aken, text="Kuva graafik", command=kuva_graafik).grid(row=5, column=0, pady=10)
+    tk.Button(kulude_aken, text="Kuva soovitus", command=kuva_soovitus).grid(row=5, column=1, pady=10)
+    
+    # Nupp eelistuste lehe avamiseks
+    tk.Button(kulude_aken,text="Ava eelistused", command=ava_eelistused).grid(row=6, column=0, padx=10, pady=10)
 
-    app.mainloop()
+    kulude_aken.mainloop()
 
 # Käivita sissetuleku aken
 ava_sissetuleku_aken()
