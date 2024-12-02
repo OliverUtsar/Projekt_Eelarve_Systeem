@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import *
+from tkinter import messagebox
 from datetime import datetime
 import matplotlib.pyplot as plt
 from collections import defaultdict
@@ -191,6 +192,9 @@ def ava_kulude_aken():
             plt.pie(kategooriad_summa, labels=kategooriad_nimed, autopct='%1.1f%%', startangle=140)
             plt.title("Kulude jaotus kategooriate lõikes")
             plt.savefig("kulude_graafik.png")
+            #Kuvab graafiku
+            plt.show()
+            
             messagebox.showinfo("Graafik", "Graafik salvestati faili 'kulude_graafik.png'")
         else:
             messagebox.showinfo("Graafik", "Ei leitud kulutusi.")
