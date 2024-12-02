@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import *
 from datetime import datetime
 import matplotlib.pyplot as plt
 from collections import defaultdict
@@ -131,9 +131,20 @@ def ava_kulude_aken():
     def ava_eelistused():
         kulude_aken.destroy()
         ava_eelistused_aken()
+     
+    #Toplevel mis näitab edukat salvestamist
+    def lisatud():
+        kestvus = 1500
+        top = Toplevel()
+        top.title('Lisatud')
+        Message(top, text="Kulu on edukalt lisatud ja salvestatud faili!", padx=20, pady=20).pack()
+        top.after(kestvus, top.destroy)
 
-     # Funktsioon kulude lisamiseks
+     # Funktsioon kulude lisamiseks     
     def lisa_kulu():
+        #Avab Toplevel-i mis näitab edukat salvestamist
+        lisatud()
+        
         summa = summa_var.get()
         kategooria = kategooria_var.get()
         
@@ -146,8 +157,7 @@ def ava_kulude_aken():
                 # Salvesta uus kulu tekstifaili
                 with open(failinimi, "a") as file:
                     file.write(f"{kulu['kuupäev']}, {kulu['summa']}, {kulu['kategooria']}\n")
-                
-                messagebox.showinfo("Lisatud", "Kulu on edukalt lisatud ja salvestatud faili!")
+                    
                 summa_var.set("")
                 kategooria_var.set("")
             except ValueError:
