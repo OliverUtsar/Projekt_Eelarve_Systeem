@@ -177,12 +177,17 @@ def ava_kulude_aken():
     # Funktsioon kulutuste vaatamiseks
     def vaata_kulusid():
         kategooriad = defaultdict(float)
-        for kulu in kulutused:
-            kategooriad[kulu["kategooria"]] += kulu["summa"]
+        with open(failinimi, mode = "r", newline = "", encoding = "utf-8") as fail:
+            reader = csv.DictReader(fail)
+            for rida in reader:
+                kategooria = rida.get("kategooria", "summa")
+                summa = float(rida.get("summa", 0))
+                kategooriad[kategooria] += summa
 
         if kategooriad:
-            kategooriad_list = "\n".join([f"{kat}: €{summa:.2f}" for kat, summa in kategooriad.items()])
-            messagebox.showinfo("Kulude kokkuvõte", kategooriad_list)
+            kategooriate_kokkuvõte = "\n".join(
+                [f"{kat}: €{summa:.2f}" for kat, summa in kategooriad.items()])
+            messagebox.showinfo("Kulude kokkuvõte", kategooriate_kokkuvõte)
         else:
             messagebox.showinfo("Kulude kokkuvõte", "Ei leitud kulutusi.")
 
