@@ -8,7 +8,7 @@ from collections import defaultdict
 # Globaalsed muutujad sissetuleku ja kuu jaoks
 sissetulek = 0
 kuu_nimi = ""
-kategooriad = ["kat1", "kat2","kat3","kat4","kat5","kat6","kat7"]
+kategooriad = ["Majapidamine", "Kommunaalid/Üür" "Toit","Kütus","Hobid","Muu","kat7"]
 
 
 
