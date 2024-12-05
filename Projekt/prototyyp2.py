@@ -155,12 +155,12 @@ def ava_kulude_aken():
                 lisatud()
                 
                 summa = float(summa)
-                kulu = {"kuupäev": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "summa": summa, "kategooria": kategooria}
+                kulu = {"kuupäev": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "summa": summa, "kategooria": kategooria, "Kuu nimi": kuu_nimi}
                 kulutused.append(kulu)
                 
                 # Salvesta uus kulu CSV-faili
                 with open(failinimi, mode="a", newline="", encoding="utf-8") as file:
-                    writer = csv.DictWriter(file, fieldnames=["kuupäev", "summa", "kategooria"])
+                    writer = csv.DictWriter(file, fieldnames=["Kuu nimi","kuupäev", "summa", "kategooria"])
                     # Kui fail on tühi, kirjuta pealkirjaread
                     if file.tell() == 0:
                         writer.writeheader()
@@ -174,23 +174,32 @@ def ava_kulude_aken():
             messagebox.showerror("Viga", "Summa ja kategooria on kohustuslikud väljad!")
 
 
+    def kulud_csvst():
+        
+        kategooriad = defaultdict(float)
+        with open(failinimi, mode = "r", newline = "", encoding = "utf-8") as fail:
+            reader = csv.DictReader(fail)
+            for rida in reader:
+                kategooria = rida.get("kategooria", "summa")
+                summa = float(rida.get("summa", 0))
+                kategooriad[kategooria] += summa
+        return kategooriad
     # Funktsioon kulutuste vaatamiseks
     def vaata_kulusid():
-        kategooriad = defaultdict(float)
-        for kulu in kulutused:
-            kategooriad[kulu["kategooria"]] += kulu["summa"]
 
+        kategooriad = kulud_csvst()
         if kategooriad:
-            kategooriad_list = "\n".join([f"{kat}: €{summa:.2f}" for kat, summa in kategooriad.items()])
-            messagebox.showinfo("Kulude kokkuvõte", kategooriad_list)
+            kategooriate_kokkuvõte = "\n".join(
+                [f"{kat}: €{summa:.2f}" for kat, summa in kategooriad.items()])
+            messagebox.showinfo("Kulude kokkuvõte", kategooriate_kokkuvõte)
         else:
             messagebox.showinfo("Kulude kokkuvõte", "Ei leitud kulutusi.")
 
     # Funktsioon kulutuste graafiku näitamiseks
     def kuva_graafik():
-        kategooriad = defaultdict(float)
-        for kulu in kulutused:
-            kategooriad[kulu["kategooria"]] += kulu["summa"]
+        kategooriad = kulud_csvst()
+#         for kulu in kulutused:
+#             kategooriad[kulu["kategooria"]] += kulu["summa"]
 
         if kategooriad:
             kategooriad_nimed = list(kategooriad.keys())
