@@ -16,6 +16,8 @@ kategooriad = ["Majapidamine", "Kommunaalid/Üür", "Toit","Kütus","Hobid","Muu
 # Andmete struktuur kulude salvestamiseks
 kulutused = []
 failinimi = "kulutused.csv"
+eelistused = []
+failinimetus = "eelistused.csv"
 
 # Esimene aken sissetuleku ja kuu valikuks
 def ava_sissetuleku_aken():
@@ -77,10 +79,18 @@ def ava_eelistused_aken():
             eelistus_kategooria = kulutuste_var.get()
             eelistus_protsent = protsent_var.get()
             
+            
             print(eelistus_kategooria, eelistus_protsent)
         except ValueError:
             messagebox.showerror("Viga")            
-
+        eelistus = {"kategooria": eelistus_kategooria, "Protsent kogu kulust": eelistus_protsent}
+        eelistused.append(eelistus)
+        with open(failinimetus, mode="w", newline="", encoding="utf-8") as file:
+            writer = csv.DictWriter(file, fieldnames=["kategooria","Protsent kogu kulust"])
+            # Kui fail on tühi, kirjuta pealkirjaread
+            if file.tell() == 0:
+                writer.writeheader()
+            writer.writerow(eelistus)
         
 # TODO nupu töö
     def tagasi_sissetuleku_aken():
@@ -236,7 +246,7 @@ def ava_kulude_aken():
     
     # Nupp eelistuste lehe avamiseks
     tk.Button(kulude_aken,text="Ava eelistused", command=ava_eelistused).grid(row=6, column=0, padx=10, pady=10)
-
+    
     kulude_aken.mainloop()
 
 # Käivita sissetuleku aken
