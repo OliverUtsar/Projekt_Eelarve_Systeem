@@ -1,4 +1,5 @@
 import tkinter as tk
+import csv
 from tkinter import *
 from tkinter import messagebox
 from datetime import datetime
@@ -8,13 +9,13 @@ from collections import defaultdict
 # Globaalsed muutujad sissetuleku ja kuu jaoks
 sissetulek = 0
 kuu_nimi = ""
-kategooriad = ["Majapidamine", "Kommunaalid/Üür" "Toit","Kütus","Hobid","Muu","kat7"]
+kategooriad = ["Majapidamine", "Kommunaalid/Üür", "Toit","Kütus","Hobid","Muu","kat7"]
 
 
 
 # Andmete struktuur kulude salvestamiseks
 kulutused = []
-failinimi = "kulutused.txt"
+failinimi = "kulutused.csv"
 
 # Esimene aken sissetuleku ja kuu valikuks
 def ava_sissetuleku_aken():
@@ -70,12 +71,11 @@ def ava_eelistused_aken():
     
     eelistus_protsent = ""
     eelistus_kategooria =""
-# TODO nupu töö  ei saa protsenti??
+    
     def kinnita_eelisus():
         try:
             eelistus_kategooria = kulutuste_var.get()
             eelistus_protsent = protsent_var.get()
-            print(eelistus_protsent)
             
             print(eelistus_kategooria, eelistus_protsent)
         except ValueError:
@@ -129,6 +129,9 @@ def ava_kulude_aken():
     kulutuste_dropdown = tk.OptionMenu(kulude_aken, kategooria_var, *kategooriad)
     kulutuste_dropdown.grid(row=2, column=1)
     
+#     def kulutuste_lugemine():
+        
+    
     def ava_eelistused():
         kulude_aken.destroy()
         ava_eelistused_aken()
@@ -143,28 +146,33 @@ def ava_kulude_aken():
 
      # Funktsioon kulude lisamiseks     
     def lisa_kulu():
-        #Avab Toplevel-i mis näitab edukat salvestamist
-        lisatud()
-        
         summa = summa_var.get()
         kategooria = kategooria_var.get()
         
         if summa and kategooria:
             try:
+                # Avab Toplevel-i, mis näitab edukat salvestamist
+                lisatud()
+                
                 summa = float(summa)
-                kulu = {"kuupäev": datetime.now(), "summa": summa, "kategooria": kategooria}
+                kulu = {"kuupäev": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "summa": summa, "kategooria": kategooria}
                 kulutused.append(kulu)
                 
-                # Salvesta uus kulu tekstifaili
-                with open(failinimi, "a") as file:
-                    file.write(f"{kulu['kuupäev']}, {kulu['summa']}, {kulu['kategooria']}\n")
-                    
+                # Salvesta uus kulu CSV-faili
+                with open(failinimi, mode="a", newline="", encoding="utf-8") as file:
+                    writer = csv.DictWriter(file, fieldnames=["kuupäev", "summa", "kategooria"])
+                    # Kui fail on tühi, kirjuta pealkirjaread
+                    if file.tell() == 0:
+                        writer.writeheader()
+                    writer.writerow(kulu)
+                
                 summa_var.set("")
                 kategooria_var.set("")
             except ValueError:
                 messagebox.showerror("Viga", "Sisesta kehtiv summa!")
         else:
             messagebox.showerror("Viga", "Summa ja kategooria on kohustuslikud väljad!")
+
 
     # Funktsioon kulutuste vaatamiseks
     def vaata_kulusid():
