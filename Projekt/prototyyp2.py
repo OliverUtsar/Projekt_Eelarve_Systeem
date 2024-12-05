@@ -85,12 +85,13 @@ def ava_eelistused_aken():
             messagebox.showerror("Viga")            
         eelistus = {"kategooria": eelistus_kategooria, "Protsent kogu kulust": eelistus_protsent}
         eelistused.append(eelistus)
-        with open(failinimetus, mode="w", newline="", encoding="utf-8") as file:
+        with open(failinimetus, mode="a", newline="", encoding="utf-8") as file:
             writer = csv.DictWriter(file, fieldnames=["kategooria","Protsent kogu kulust"])
             # Kui fail on tühi, kirjuta pealkirjaread
             if file.tell() == 0:
                 writer.writeheader()
             writer.writerow(eelistus)
+        file.close()
         
 # TODO nupu töö
     def tagasi_sissetuleku_aken():
