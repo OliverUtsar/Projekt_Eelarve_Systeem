@@ -6,7 +6,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 from collections import defaultdict
 
-# Globaalsed muutujad sissetuleku ja kuu jaoks
+# Globaalsed muutujad sissetuleku, kuu ja kategooriate jaoks
 sissetulek = 0
 kuu_nimi = ""
 kategooriad = ["Majapidamine", "Kommunaalid/Üür", "Toit","Kütus","Hobid","Muu"]
@@ -54,7 +54,7 @@ def ava_sissetuleku_aken():
         ava_eelistused_aken()
         
     
-
+    # Sulgeb sisstetulekute akna ja avab kulude akna
     def mine_edasi():
         sissetuleku_aken.destroy()
         ava_kulude_aken()
@@ -73,14 +73,14 @@ def ava_eelistused_aken():
     eelistus_kategooria =""
     
     def kinnita_eelisus():
+        
         try:
             eelistus_kategooria = kulutuste_var.get()
-            eelistus_protsent = protsent_var.get()
-            
-            
+            eelistus_protsent = protsent_var.get()        
             print(eelistus_kategooria, eelistus_protsent)
         except ValueError:
-            messagebox.showerror("Viga")            
+            messagebox.showerror("Viga")
+                                            
         eelistus = {"kategooria": eelistus_kategooria, "Protsent kogu kulust": eelistus_protsent}
         eelistused.append(eelistus)
         with open(failinimetus, mode="a", newline="", encoding="utf-8") as file:
@@ -91,12 +91,11 @@ def ava_eelistused_aken():
             writer.writerow(eelistus)
         file.close()
         
+    # Sulgeb eelistuste akna ja avab sissetuleku akna    
     def tagasi_sissetuleku_aken():
         eelistused_aken.destroy()
-        ava_sissetuleku_aken()
-        
-        
-        
+        ava_sissetuleku_aken()       
+            
     eelistused_aken = tk.Tk()
     eelistused_aken.title(f"Eelistused - {kuu_nimi}")
     tk.Label(eelistused_aken, text=f"Määra {kuu_nimi} kulutuste jaotus").grid(row=0, column=0, columnspan=2, pady=5)
@@ -115,31 +114,23 @@ def ava_eelistused_aken():
     
     
 
-
-    
-
 # Põhiaken kulude haldamiseks
 def ava_kulude_aken():
     kulude_aken = tk.Tk()
     kulude_aken.title(f"Eelarve Jälgimine - {kuu_nimi}")
-
     tk.Label(kulude_aken, text=f"Kuu sissetulek: €{sissetulek:.2f}").grid(row=0, column=0, columnspan=2, pady=5)
 
     # Sisestusväljad ja nupud kulude lisamiseks
     summa_var = tk.StringVar()
-
     tk.Label(kulude_aken, text="Summa (€):").grid(row=1, column=0)
     tk.Entry(kulude_aken, textvariable=summa_var).grid(row=1, column=1)
-
-    tk.Label(kulude_aken, text="Kategooria:").grid(row=2, column=0)
-    
+    tk.Label(kulude_aken, text="Kategooria:").grid(row=2, column=0)    
     kategooria_var = tk.StringVar()
     kulutuste_dropdown = tk.OptionMenu(kulude_aken, kategooria_var, *kategooriad)
     kulutuste_dropdown.grid(row=2, column=1)
     
-#     def kulutuste_lugemine():
         
-    
+    # Sulgeb kulude akna ja avab eelistuste akna 
     def ava_eelistused():
         kulude_aken.destroy()
         ava_eelistused_aken()
@@ -160,8 +151,7 @@ def ava_kulude_aken():
         if summa and kategooria:
             try:
                 # Avab Toplevel-i, mis näitab edukat salvestamist
-                lisatud()
-                
+                lisatud()                
                 summa = float(summa)
                 kulu = {"kuupäev": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "summa": summa, "kategooria": kategooria, "Kuu nimi": kuu_nimi}
                 kulutused.append(kulu)
@@ -181,9 +171,8 @@ def ava_kulude_aken():
         else:
             messagebox.showerror("Viga", "Summa ja kategooria on kohustuslikud väljad!")
 
-
-    def kulud_csvst():
-        
+    # Loeb kulud CSV failist. Retunring dictionary kuludest
+    def kulud_csvst():        
         kategooriad = defaultdict(float)
         with open(failinimi, mode = "r", newline = "", encoding = "utf-8") as fail:
             reader = csv.DictReader(fail)
@@ -192,9 +181,10 @@ def ava_kulude_aken():
                 summa = float(rida.get("summa", 0))
                 kategooriad[kategooria] += summa
         return kategooriad
+    
+    
     # Funktsioon kulutuste vaatamiseks
     def vaata_kulusid():
-
         kategooriad = kulud_csvst()
         if kategooriad:
             kategooriate_kokkuvõte = "\n".join(
@@ -206,26 +196,23 @@ def ava_kulude_aken():
     # Funktsioon kulutuste graafiku näitamiseks
     def kuva_graafik():
         kategooriad = kulud_csvst()
-
-
         if kategooriad:
             kategooriad_nimed = list(kategooriad.keys())
             kategooriad_summa = list(kategooriad.values())
-
             plt.figure(figsize=(8, 5))
             plt.pie(kategooriad_summa, labels=kategooriad_nimed, autopct='%1.1f%%', startangle=140)
             plt.title("Kulude jaotus kategooriate lõikes")
             plt.savefig("kulude_graafik.png")
-            #Kuvab graafiku
-            plt.show()
             
+            #Kuvab graafiku
+            plt.show()            
             messagebox.showinfo("Graafik", "Graafik salvestati faili 'kulude_graafik.png'")
         else:
             messagebox.showinfo("Graafik", "Ei leitud kulutusi.")
 
     # Lihtne soovitus funktsioon
-    def kuva_soovitus():
-        
+#     TODO mingi algo siia taha, mis arvestab eelistusi CSV/st
+    def kuva_soovitus():        
 # Võtab kulud CSV-st ja liidab kõik kokku
         kogukulu = sum(kulud_csvst().values())
                 
