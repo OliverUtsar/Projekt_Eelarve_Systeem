@@ -9,7 +9,7 @@ from collections import defaultdict
 # Globaalsed muutujad sissetuleku ja kuu jaoks
 sissetulek = 0
 kuu_nimi = ""
-kategooriad = ["Majapidamine", "Kommunaalid/Üür", "Toit","Kütus","Hobid","Muu","kat7"]
+kategooriad = ["Majapidamine", "Kommunaalid/Üür", "Toit","Kütus","Hobid","Muu"]
 
 
 
@@ -61,9 +61,7 @@ def ava_sissetuleku_aken():
 
 
     tk.Button(sissetuleku_aken, text="Kinnita", command=kinnita_sissetulek).grid(row=0, column=2, columnspan=2, pady=10)
-# TODO funktsionaalsus
     tk.Button(sissetuleku_aken, text="Mine edasi", command=mine_edasi).grid(row=1, column=2, columnspan=2, pady=10)
-# TODO  funktsionaalsus
     tk.Button(sissetuleku_aken, text="Eelistused", command=ava_eelistused).grid(row=4, column=0, columnspan=2, pady=10)
     
     sissetuleku_aken.mainloop()
@@ -93,7 +91,6 @@ def ava_eelistused_aken():
             writer.writerow(eelistus)
         file.close()
         
-# TODO nupu töö
     def tagasi_sissetuleku_aken():
         eelistused_aken.destroy()
         ava_sissetuleku_aken()
@@ -209,8 +206,7 @@ def ava_kulude_aken():
     # Funktsioon kulutuste graafiku näitamiseks
     def kuva_graafik():
         kategooriad = kulud_csvst()
-#         for kulu in kulutused:
-#             kategooriad[kulu["kategooria"]] += kulu["summa"]
+
 
         if kategooriad:
             kategooriad_nimed = list(kategooriad.keys())
@@ -229,7 +225,10 @@ def ava_kulude_aken():
 
     # Lihtne soovitus funktsioon
     def kuva_soovitus():
-        kogukulu = sum(kulu["summa"] for kulu in kulutused)
+        
+# Võtab kulud CSV-st ja liidab kõik kokku
+        kogukulu = sum(kulud_csvst().values())
+                
         if kogukulu > sissetulek * 0.8:
             soovitus = "Teie kulud on üsna kõrged! Kaaluge vähendamist!"
         elif kogukulu > sissetulek * 0.5:
