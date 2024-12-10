@@ -116,18 +116,59 @@ def ava_eelistused_aken():
 
 # Põhiaken kulude haldamiseks
 def ava_kulude_aken():
+    
+    # Loeb kulud CSV failist. Retunring dictionary kuludest. kui CSV-d ei ole, returnib 0
+    def kulud_csvst():        
+        kategooriad = defaultdict(float)
+        try:            
+            with open(failinimi, mode = "r", newline = "", encoding = "utf-8") as fail:
+                reader = csv.DictReader(fail)
+                for rida in reader:
+                    kategooria = rida.get("kategooria", "summa")
+                    summa = float(rida.get("summa", 0))
+                    kategooriad[kategooria] += summa
+                    
+        except FileNotFoundError:
+            return 0
+        
+        return kategooriad
+    
+    
+    # Funktsioon kulutuste vaatamiseks
+    def vaata_kulusid():
+        kategooriad = kulud_csvst()
+        if kategooriad == 0:
+             messagebox.showinfo("Kulude kokkuvõte", "Ei leitud kulutusi.")
+            
+        elif kategooriad != 0:
+            kategooriate_kokkuvõte = "\n".join(
+                [f"{kat}: €{summa:.2f}" for kat, summa in kategooriad.items()])
+            messagebox.showinfo("Kulude kokkuvõte", kategooriate_kokkuvõte)
+        else:
+            messagebox.showinfo("Kulude kokkuvõte", "Ei leitud kulutusi.")
+    try:
+        
+        väljaminek_summa = sum(kulud_csvst().values())
+        
+    except AttributeError:
+        väljaminek_summa = 0
+    
     kulude_aken = tk.Tk()
     kulude_aken.title(f"Eelarve Jälgimine - {kuu_nimi}")
     tk.Label(kulude_aken, text=f"Kuu sissetulek: €{sissetulek:.2f}").grid(row=0, column=0, columnspan=2, pady=5)
+#     Kuvab jooksvat summat kulutustest
+    tk.Label(kulude_aken, text=f"Kuu kulutused kokku: €").grid (row =1, column=0, columnspan=1, pady=5)
+    väljaminek = tk.Label(kulude_aken, text=väljaminek_summa)
+    väljaminek.grid (row =1, column=1, pady=5)
 
     # Sisestusväljad ja nupud kulude lisamiseks
     summa_var = tk.StringVar()
-    tk.Label(kulude_aken, text="Summa (€):").grid(row=1, column=0)
-    tk.Entry(kulude_aken, textvariable=summa_var).grid(row=1, column=1)
-    tk.Label(kulude_aken, text="Kategooria:").grid(row=2, column=0)    
+    tk.Label(kulude_aken, text="Summa (€):").grid(row=2, column=0)
+    tk.Entry(kulude_aken, textvariable=summa_var).grid(row=2, column=1)
+    tk.Label(kulude_aken, text="Kategooria:").grid(row=3, column=0)    
     kategooria_var = tk.StringVar()
     kulutuste_dropdown = tk.OptionMenu(kulude_aken, kategooria_var, *kategooriad)
-    kulutuste_dropdown.grid(row=2, column=1)
+    kulutuste_dropdown.grid(row=3, column=1)
     
         
     # Sulgeb kulude akna ja avab eelistuste akna 
@@ -137,6 +178,10 @@ def ava_kulude_aken():
      
     #Toplevel mis näitab edukat salvestamist
     def lisatud():
+#         lihtne kontroll. kui csv tühi, siis sealt ei loe
+        if kulud_csvst() != 0:
+            väljaminek.config(text=sum(kulud_csvst().values()))
+            
         kestvus = 1500
         top = Toplevel()
         top.title('Lisatud')
@@ -150,8 +195,7 @@ def ava_kulude_aken():
         
         if summa and kategooria:
             try:
-                # Avab Toplevel-i, mis näitab edukat salvestamist
-                lisatud()                
+                              
                 summa = float(summa)
                 kulu = {"kuupäev": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "summa": summa, "kategooria": kategooria, "Kuu nimi": kuu_nimi}
                 kulutused.append(kulu)
@@ -163,35 +207,17 @@ def ava_kulude_aken():
                     if file.tell() == 0:
                         writer.writeheader()
                     writer.writerow(kulu)
-                
                 summa_var.set("")
                 kategooria_var.set("")
+                
+                # Avab Toplevel-i, mis näitab edukat salvestamist
+                lisatud()  
             except ValueError:
                 messagebox.showerror("Viga", "Sisesta kehtiv summa!")
         else:
             messagebox.showerror("Viga", "Summa ja kategooria on kohustuslikud väljad!")
 
-    # Loeb kulud CSV failist. Retunring dictionary kuludest
-    def kulud_csvst():        
-        kategooriad = defaultdict(float)
-        with open(failinimi, mode = "r", newline = "", encoding = "utf-8") as fail:
-            reader = csv.DictReader(fail)
-            for rida in reader:
-                kategooria = rida.get("kategooria", "summa")
-                summa = float(rida.get("summa", 0))
-                kategooriad[kategooria] += summa
-        return kategooriad
     
-    
-    # Funktsioon kulutuste vaatamiseks
-    def vaata_kulusid():
-        kategooriad = kulud_csvst()
-        if kategooriad:
-            kategooriate_kokkuvõte = "\n".join(
-                [f"{kat}: €{summa:.2f}" for kat, summa in kategooriad.items()])
-            messagebox.showinfo("Kulude kokkuvõte", kategooriate_kokkuvõte)
-        else:
-            messagebox.showinfo("Kulude kokkuvõte", "Ei leitud kulutusi.")
 
     # Funktsioon kulutuste graafiku näitamiseks
     def kuva_graafik():
@@ -209,6 +235,8 @@ def ava_kulude_aken():
             messagebox.showinfo("Graafik", "Graafik salvestati faili 'kulude_graafik.png'")
         else:
             messagebox.showinfo("Graafik", "Ei leitud kulutusi.")
+
+
 
     # Lihtne soovitus funktsioon
 #     TODO mingi algo siia taha, mis arvestab eelistusi CSV/st
